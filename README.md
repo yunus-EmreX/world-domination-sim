@@ -1,73 +1,149 @@
-# Welcome to your Lovable project
+ASYMMETRIC WARFARE
 
-## Project info
+Modern dünyada savaş artık sadece cephede kazanılmıyor.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Asymmetric Warfare; askeri güç, diplomasi, istihbarat, ekonomi ve gizli operasyonları birleştiren derin bir küresel strateji simülasyonudur.
 
-## How can I edit this code?
+Bu oyunda bir ülkeyi yönetir, dünyadaki güç dengelerini değiştirir ve modern çağın karmaşık savaş ortamında hayatta kalmaya çalışırsın.
 
-There are several ways of editing your application.
+Savaş sadece tanklar ve uçaklarla kazanılmaz.
+Bazen bir darbe, bazen ekonomik yaptırım, bazen de gizli bir operasyon savaşın kaderini belirler.
 
-**Use Lovable**
+OYUN ÖZELLİKLERİ
+Küresel Strateji
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Dünyanın herhangi bir ülkesini seç ve kaderini değiştir.
 
-Changes made via Lovable will be committed automatically to this repo.
+Diplomasi
 
-**Use your preferred IDE**
+Ekonomi
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Askeri güç
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+İstihbarat operasyonları
 
-Follow these steps:
+İç siyaset
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Hepsi senin kontrolünde.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Asimetrik Savaş Mekanikleri
 
-# Step 3: Install the necessary dependencies.
-npm i
+Modern savaşın gerçek yüzünü deneyimle:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Gerilla savaşları
 
-**Edit a file directly in GitHub**
+Hibrit savaş
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Siber saldırılar
 
-**Use GitHub Codespaces**
+Dezenformasyon operasyonları
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Gizli istihbarat faaliyetleri
 
-## What technologies are used for this project?
+Proxy savaşları
 
-This project is built with:
+Her savaş doğrudan cephede yaşanmaz.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Derin Dünya Simülasyonu
 
-## How can I deploy this project?
+Oyun sadece savaş üzerine kurulu değil.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Her ülke:
 
-## Can I connect a custom domain to my Lovable project?
+ekonomi
 
-Yes, you can!
+nüfus
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+politik istikrar
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+teknoloji
+
+askeri güç
+
+gibi parametrelerle simüle edilir.
+
+Dünyadaki her karar zincirleme reaksiyonlar oluşturabilir.
+
+Gelişmiş Yapay Zeka
+
+Ülkeler sadece rastgele hareket etmez.
+
+AI:
+
+jeopolitik çıkarları analiz eder
+
+tehditleri değerlendirir
+
+ittifaklar kurar
+
+gizli operasyonlar planlar
+
+Her oyun farklı bir dünya düzeni yaratır.
+
+40+ Gelişmiş Stratejik Mekanik
+
+Oyunda grand strategy seviyesinde derinlik sağlayan onlarca sistem bulunur:
+
+iç siyaset ve darbe riski
+
+ekonomik krizler
+
+enerji savaşları
+
+silah teknolojisi yarışı
+
+propaganda ve medya savaşı
+
+askeri doktrinler
+
+lojistik ve tedarik hatları
+
+küresel krizler
+
+bölgesel çatışmalar
+
+Her mekanik oyunun gidişatını değiştirebilir.
+
+Gizli Mekanikler
+
+Bazı sistemler oyuncuya açık değildir.
+
+Arka planda çalışan sistemler:
+
+dünya güç dengesi
+
+küresel istikrarsızlık
+
+gizli ittifaklar
+
+istihbarat ağları
+
+oyunu çok daha derin ve gerçekçi hale getirir.
+
+HER OYUN FARKLI
+
+Her oynayışta:
+
+yeni ittifaklar kurulabilir
+
+savaşlar farklı şekilde başlayabilir
+
+ülkeler yükselip çökebilir
+
+dünya tamamen değişebilir
+
+Hiçbir oyun birbirinin aynısı değildir.
+
+GRAND STRATEGY DENEYİMİ
+
+Asymmetric Warfare;
+
+Hearts of Iron tarzı derinlik
+
+küresel diplomasi
+
+modern savaş simülasyonu
+
+bir araya getiren büyük bir strateji oyunudur.
+
+Dünyayı yönetmeye hazır mısın?
