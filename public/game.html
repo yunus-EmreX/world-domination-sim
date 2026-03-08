@@ -489,22 +489,24 @@ function launchCombined(atk,tgt){launchMissile(atk,tgt);setTimeout(()=>launchDro
 function onImpact(p){
   const tgt=countries.find(c=>c.id===p.toId),atk=countries.find(c=>c.id===p.fromId);
   if(!tgt||tgt.destroyed)return;
-  // Alliance protection: if target is player's ally, missile has extra intercept chance
   const isAlly=tgt===player&&atk&&relationships[atk.id]&&relationships[atk.id].rel==='ally';
   if(isAlly){notify('🏳 İTTİFAK KORUMASI: '+atk.sh+' müttefik statüsü sona erdi!','defend');relationships[atk.id].rel='hostile';}
   const airDefBonus=tgt.military.airDefense*.13+(isAlly?.0:.0);
   if(Math.random()<tgt.military.airDefense*.13){
     const bp=bezier(p.fx,p.fy,p.tx,p.ty,.82);
     spawnExp(bp.x,bp.y,'#00aaff','sm');spawnMapWave(bp.x,bp.y,'#00aaff',false);
+    // Mid-air explosion effect for intercepted missiles
+    for(let i=0;i<8;i++){const a=Math.random()*Math.PI*2,sp=Math.random()*30+10;particles.push({x:bp.x,y:bp.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:Math.random()*2+.5,col:'#66ccff',life:1,dec:2});}
     if(tgt===player)notify('🛡 İNTERSEPT! '+(atk?atk.sh:'?')+' imha edildi','intercept');
     return;
   }
   tgt.hp=Math.max(0,tgt.hp-p.dmg);tgt.shT=.45;
+  if(tgt===player)screenShake();
   worldTension=Math.min(100,worldTension+0.8);
   spawnExp(p.tx,p.ty,p.type==='missile'?'#ff6600':'#ffaa00','md');
   spawnMapWave(p.tx,p.ty,p.type==='missile'?'#ff4400':'#ffaa00',true);
   if(tgt===player)notify('💥 İSABET! -'+Math.floor(p.dmg)+' HP — '+(atk?atk.sh:'?'),'defend');
-  if(tgt.hp<=0&&!tgt.destroyed){tgt.destroyed=true;worldTension=Math.min(100,worldTension+6);spawnExp(tgt.cx,tgt.cy,'#ff2200','lg');spawnMapWave(tgt.cx,tgt.cy,'#ff2200',true);spawnMapWave(tgt.cx,tgt.cy,'#ff8800',true);notify('☠ '+tgt.name.toUpperCase()+' İMHA EDİLDİ!','attack');}
+  if(tgt.hp<=0&&!tgt.destroyed){tgt.destroyed=true;worldTension=Math.min(100,worldTension+6);spawnExp(tgt.cx,tgt.cy,'#ff2200','lg');spawnMapWave(tgt.cx,tgt.cy,'#ff2200',true);spawnMapWave(tgt.cx,tgt.cy,'#ff8800',true);notify('☠ '+tgt.name.toUpperCase()+' İMHA EDİLDİ!','attack');screenShake();}
 }
 function aiAtk(c,atkPlayerChance){if(!c.military.missiles&&!c.military.drones)return;const alive=countries.filter(x=>x.id!==c.id&&!x.destroyed);if(!alive.length)return;if(typeof atkPlayerChance==='undefined')atkPlayerChance=0.3;const tgt=player&&!player.destroyed&&Math.random()<atkPlayerChance?player:alive[Math.floor(Math.random()*alive.length)];if(c.military.drones>0&&Math.random()<.5)launchDrones(c,tgt);else if(c.military.missiles>0)launchMissile(c,tgt);}
 
