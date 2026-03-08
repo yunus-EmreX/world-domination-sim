@@ -268,6 +268,8 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:r
   <button id="restart-btn" onclick="location.reload()">YENİDEN BAŞLAT</button>
 </div>
 <div id="t-hint">[ T ] +$1000 &nbsp;|&nbsp; [ P ] Araştırma Bedava &nbsp;|&nbsp; [ X ] Tam Can</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script>
 // =============================================
 // ASYMMETRIC WARFARE II - Engine
@@ -460,6 +462,7 @@ let globeRot=0,introT=0,globalT=0,lastT=0;
 let hovC=null,atkCD=0,uiTimer=0,gameOverShown=false,diffSetting='medium';
 let spyMissions=[],gameDate={y:2026,m:1,d:1},dayAccum=0,wt=8,gameSpeed=1;
 let pendingWar=null,rels={},researchFree=false,newsQ=[],warPairs=[];
+let worldGeo=null,worldCacheCanvas=null;
 const MN=['OCA','ŞUB','MAR','NİS','MAY','HAZ','TEM','AĞU','EYL','EKİ','KAS','ARA'];
 
 function setSpeed(s){gameSpeed=s;document.querySelectorAll('.spbtn').forEach((b,i)=>b.classList.toggle('on',i+1===s));}
@@ -471,9 +474,60 @@ function init(){
   for(let i=0;i<300;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.3,op:Math.random()*.6+.1,ph:Math.random()*Math.PI*2,sp:Math.random()*.6+.4});
   buildCountries();buildPolys();
   addNews('ASYMMETRIC WARFARE II BAŞLADI — Küresel güç dengesi kırılgan');
+  loadWorldData();
   requestAnimationFrame(loop);
 }
 
+async function loadWorldData(){
+  try{
+    const res=await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json');
+    const topo=await res.json();
+    worldGeo={
+      land:topojson.feature(topo,topo.objects.land),
+      countries:topojson.feature(topo,topo.objects.countries),
+      borders:topojson.mesh(topo,topo.objects.countries,(a,b)=>a!==b)
+    };
+    buildWorldCache();
+  }catch(e){console.warn('World map load failed:',e);}
+}
+function makeGeoPath(targetCtx){
+  const proj=d3.geoTransform({point:function(lon,lat){
+    if(lat<LAT_BOT-2||lat>LAT_TOP+2)return;
+    const p=geoXY(lon,lat);this.stream.point(p.x,p.y);
+  }});
+  return d3.geoPath().projection(proj).context(targetCtx);
+}
+function buildWorldCache(){
+  if(!worldGeo||typeof d3==='undefined'||typeof topojson==='undefined')return;
+  worldCacheCanvas=document.createElement('canvas');
+  worldCacheCanvas.width=W;worldCacheCanvas.height=H;
+  const wc=worldCacheCanvas.getContext('2d');
+  const path=makeGeoPath(wc);
+  // Ocean
+  const og=wc.createLinearGradient(0,0,0,H);og.addColorStop(0,'#000e1a');og.addColorStop(1,'#00050e');
+  wc.fillStyle=og;wc.fillRect(0,0,W,H);
+  // Grid
+  wc.strokeStyle='rgba(0,200,100,.022)';wc.lineWidth=.55;
+  for(let lon=-180;lon<=180;lon+=30){const p1=geoXY(lon,LAT_TOP),p2=geoXY(lon,LAT_BOT);wc.beginPath();wc.moveTo(p1.x,p1.y);wc.lineTo(p2.x,p2.y);wc.stroke();}
+  for(let lat=-60;lat<=80;lat+=30){const p1=geoXY(-180,lat),p2=geoXY(180,lat);wc.beginPath();wc.moveTo(p1.x,p1.y);wc.lineTo(p2.x,p2.y);wc.stroke();}
+  wc.strokeStyle='rgba(0,255,100,.05)';wc.lineWidth=.9;
+  const eq=geoXY(-180,0);wc.beginPath();wc.moveTo(0,eq.y);wc.lineTo(W,eq.y);wc.stroke();
+  // Land fill with subtle gradient
+  wc.beginPath();path(worldGeo.land);
+  const lg=wc.createLinearGradient(0,0,0,H);lg.addColorStop(0,'#0c2210');lg.addColorStop(.5,'#091a0c');lg.addColorStop(1,'#071408');
+  wc.fillStyle=lg;wc.fill();
+  // Land subtle inner glow
+  wc.beginPath();path(worldGeo.land);
+  wc.shadowColor='rgba(0,255,80,.12)';wc.shadowBlur=3;
+  wc.strokeStyle='rgba(0,255,80,.22)';wc.lineWidth=0.9;wc.stroke();wc.shadowBlur=0;
+  // Internal country borders
+  wc.beginPath();path(worldGeo.borders);
+  wc.strokeStyle='rgba(0,160,50,.13)';wc.lineWidth=0.45;wc.stroke();
+  // Vignette
+  const v=wc.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.9);
+  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,20,.45)');
+  wc.fillStyle=v;wc.fillRect(0,0,W,H);
+}
 function buildCountries(){
   countries=[];
   for(const d of CD){
@@ -771,14 +825,20 @@ function sphP(lat,lon,rot,cx,cy,R){const phi=lat*Math.PI/180,lam=(lon+rot)*Math.
 
 function drawWorldMap(){
   const og=ctx.createLinearGradient(0,0,0,H);og.addColorStop(0,'#000e1a');og.addColorStop(1,'#00050e');ctx.fillStyle=og;ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(0,200,100,.022)';ctx.lineWidth=.55;
-  for(let lon=-180;lon<=180;lon+=30){const p1=geoXY(lon,LAT_TOP),p2=geoXY(lon,LAT_BOT);ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
-  for(let lat=-60;lat<=80;lat+=30){const p1=geoXY(-180,lat),p2=geoXY(180,lat);ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
-  ctx.strokeStyle='rgba(0,255,100,.05)';ctx.lineWidth=.9;const eq=geoXY(-180,0);ctx.beginPath();ctx.moveTo(0,eq.y);ctx.lineTo(W,eq.y);ctx.stroke();
-  for(const pts of LAND){const sp=pts.map(([lon,lat])=>{const p=geoXY(lon,lat);return[p.x,p.y];});ctx.beginPath();sp.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.closePath();ctx.fillStyle='#071207';ctx.fill();}
+  if(worldCacheCanvas){
+    ctx.drawImage(worldCacheCanvas,0,0);
+  }else{
+    ctx.strokeStyle='rgba(0,200,100,.022)';ctx.lineWidth=.55;
+    for(let lon=-180;lon<=180;lon+=30){const p1=geoXY(lon,LAT_TOP),p2=geoXY(lon,LAT_BOT);ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
+    for(let lat=-60;lat<=80;lat+=30){const p1=geoXY(-180,lat),p2=geoXY(180,lat);ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
+    ctx.strokeStyle='rgba(0,255,100,.05)';ctx.lineWidth=.9;const eq=geoXY(-180,0);ctx.beginPath();ctx.moveTo(0,eq.y);ctx.lineTo(W,eq.y);ctx.stroke();
+    for(const pts of LAND){const sp=pts.map(([lon,lat])=>{const p=geoXY(lon,lat);return[p.x,p.y];});ctx.beginPath();sp.forEach(([x,y],i)=>i===0?ctx.moveTo(x,y):ctx.lineTo(x,y));ctx.closePath();ctx.fillStyle='#071207';ctx.fill();}
+  }
   for(const c of countries){
     const isHov=hovC&&hovC.id===c.id,isSel=selTarget&&selTarget.id===c.id,isP=player&&player.id===c.id;
     const isWar=player&&isAtWar(player,c);
+    const needsOverlay=c.destroyed||isP||isWar||isSel||isHov;
+    if(worldCacheCanvas&&phase==='game'&&!needsOverlay)continue;
     const pids=c.id==='usa'?['usa','usa_ak']:c.id==='russia'?['russia','russia_far']:[c.id];
     for(const pid of pids){
       const sp=screenPolys[pid];if(!sp)continue;
@@ -788,7 +848,7 @@ function drawWorldMap(){
       else if(isWar){ctx.fillStyle='rgba(70,8,8,.75)';ctx.shadowColor='#ff3300';ctx.shadowBlur=8;}
       else if(isSel){ctx.fillStyle=CC(c.id,'h');ctx.shadowColor='#ff4400';ctx.shadowBlur=10;}
       else if(isHov){ctx.fillStyle=CC(c.id,'h');ctx.shadowColor=CC(c.id,'b');ctx.shadowBlur=7;}
-      else ctx.fillStyle=CC(c.id,'f');
+      else ctx.fillStyle=worldCacheCanvas?'rgba(0,20,5,0.35)':CC(c.id,'f');
       ctx.fill();ctx.shadowBlur=0;
       ctx.strokeStyle=c.destroyed?'#111':isP?'rgba(0,255,100,.7)':isWar?'rgba(255,50,0,.6)':isSel?'rgba(255,80,0,.8)':isHov?CC(c.id,'b'):'rgba(0,255,80,.12)';
       ctx.lineWidth=isP?2:isSel?1.5:isHov?1:.5;ctx.stroke();
@@ -1105,7 +1165,7 @@ document.addEventListener('keydown',e=>{
   if(k==='2'&&phase==='game')setSpeed(2);
   if(k==='3'&&phase==='game')setSpeed(3);
 });
-window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;for(const c of countries){const p=geoXY(c.lon,c.lat);c.cx=p.x;c.cy=p.y;}buildPolys();});
+window.addEventListener('resize',()=>{W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;for(const c of countries){const p=geoXY(c.lon,c.lat);c.cx=p.x;c.cy=p.y;}buildPolys();buildWorldCache();});
 
 init();
 </script>
